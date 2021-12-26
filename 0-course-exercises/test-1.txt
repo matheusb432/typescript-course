@@ -1,0 +1,21 @@
+1)	Why are "Types" useful and offer an advantage compared to vanilla JavaScript?
+
+	--	Types allow you to detect if data of a wrong type is used or pass around, hence you can avoid unexpected runtime errors.
+
+2)	Will the following code throw a compilation error?
+
+		let userName: string;
+		userName = 'Maximilian';
+		userName = false;
+
+		--	Yes, userName cannot be assigned to a boolean value since it's assigned to the string type in it's definition.
+
+3)	Does this code rely on type inference?
+
+		const age: number = 29;
+
+		--	No, the type is also assigned explicitly
+
+4)	What's the difference between JavaScript types (e.g. typeof 'Max' => 'string') and TypeScript types (e.g. const name: string = '...')?
+
+	--	TS types are checked in compilation, while JS types are checked only at runtime
