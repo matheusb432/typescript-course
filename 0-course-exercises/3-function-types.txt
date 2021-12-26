@@ -1,0 +1,33 @@
+1) 	Will this code compile?
+
+		function sendRequest(data: string, cb: (response: any) => void) {
+		  return cb({data: 'Hi there!'});
+		}
+		 
+		sendRequest('Send this!', (response) => { 
+		  console.log(response);
+		  return true;
+		 });
+
+		 --	Yes, even though the returned type in the parameter callback is not void, it can still return something. 
+
+2)	What's the idea behind a "function type"?
+
+		--	Function types define the parameters and return of a function
+
+3)	Which code snippet is better (i.e. which code should you write)?
+
+		1)
+
+		function sayHi(): void {
+		  // ...
+		}
+		OR
+
+		2)
+
+		function sayHi(): undefined {
+		  // ...
+		}
+
+		--	Assuming the function should not return anything, then 1).
