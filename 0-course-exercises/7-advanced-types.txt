@@ -1,0 +1,35 @@
+1)	What's a "Type Guard"?
+
+		--	A code pattern where you check for a certain type before you try to do something with it at runtime
+
+2)	Which of the following type guards would ensure that you get NO runtime error?
+
+	A)
+		function size(input: string | number) {
+		  if (input instanceof 'string') {
+		    return input.length;
+		  }
+		  return input;
+		}
+
+	B)
+		function size(input: string | number) {
+		  if (<string>input) {
+		    return input.length;
+		  }
+		  return input;
+		}
+
+	C)
+		function size(input: string | number) {
+		  if (typeof input === 'string') {
+		    return input.length;
+		  }
+		  return input;
+		}
+
+	--	C, the other ones are incorrect syntax
+
+3)	In which cases is type casting helpful?
+
+		--	You want to inform TS that a certain value is of a specific type

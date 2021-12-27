@@ -1,0 +1,13 @@
+1)	When can Generics come in very handy?
+
+		--	In cases where you have a type that works together with multiple other types (e.g. an object which emits data of different types)
+
+2)	Would the following usage of a generic type make sense?
+
+		>>	const data = extractData<string>(user, 'userId');
+
+		--	Yes, extractData() probably returns different data based on the provided arguments.
+
+3)	What's the idea behind constraints (when talking about generics)?
+
+		--	Constraints allow you to narrow down the concrete types that may be used in a generic function, class, etc...	

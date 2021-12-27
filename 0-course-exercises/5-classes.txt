@@ -1,0 +1,15 @@
+1)	What's a "static method"?
+
+		--	A method you call directly on a class, not on an object created based on it
+
+2)	What's the idea behind "inheritance"?
+
+		--	Inheritance allows you to share some common functionality and yet create more specialized blueprints
+
+3)	What's an abstract class?
+
+		--	A class that can't be instantiated but has to be extended
+
+4)	What's the idea behind "singleton classes"?
+
+		--	You only ever have one instance of a singleton class
