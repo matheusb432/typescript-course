@@ -206,9 +206,16 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
     super('single-project', hostId, false, project.id);
 
     this.project = project;
+  }
 
-    this.configure();
-    this.renderContent();
+  // NOTE the course code had configure() and renderContent() calls in the constructor, but I've written this method since they were side effects that make this class more coupled.
+  static initItem(hostId: string, project: Project): ProjectItem {
+    const projectItem = new ProjectItem(hostId, project);
+
+    projectItem.configure();
+    projectItem.renderContent();
+
+    return projectItem;
   }
 
   @Autobind
@@ -244,10 +251,15 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
     super('project-list', 'app', false, `${type}-projects`);
 
     this.assignedProjects = [];
+  }
 
-    this.configure();
+  static initList(type: ProjectStatus = ProjectStatus.Active) {
+    const projectList = new ProjectList(type);
 
-    this.renderContent();
+    projectList.configure();
+    projectList.renderContent();
+
+    return projectList;
   }
 
   @Autobind
@@ -308,9 +320,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
     this.destroyItems(listEl);
 
-    for (const projectItem of this.assignedProjects) {
+    for (const project of this.assignedProjects) {
       // NOTE the project items will be rendered at instantiation, so even if the references of these objects are lost, the elements are still correctly rendered.
-      new ProjectItem(listEl.id, projectItem);
+      // new ProjectItem(listEl.id, projectItem);
+      ProjectItem.initItem(listEl.id, project);
     }
   }
 
@@ -337,8 +350,15 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
       '#description'
     ) as HTMLTextAreaElement;
     this.peopleInputElement = this.element.querySelector('#people') as HTMLInputElement;
+  }
 
-    this.configure();
+  static initInput() {
+    // TODO rename to more descriptive after modules refactor is realized
+    const pInput = new ProjectInput();
+
+    pInput.configure();
+
+    return pInput;
   }
 
   private gatherUserInput(): [string, string, number] | void {
@@ -387,6 +407,6 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   }
 }
 
-const projInput = new ProjectInput();
-const activeProjList = new ProjectList(ProjectStatus.Active);
-const finishedProjList = new ProjectList(ProjectStatus.Finished);
+const projectInput = ProjectInput.initInput();
+const activeProjectList = ProjectList.initList(ProjectStatus.Active);
+const finishedProjectList = ProjectList.initList(ProjectStatus.Finished);

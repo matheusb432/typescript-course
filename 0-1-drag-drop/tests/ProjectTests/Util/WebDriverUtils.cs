@@ -20,7 +20,7 @@ namespace ProjectTests.Util
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public static int RandomInt(int min = 0, int max = 5)
+        public static int RandomInt(int min = 1, int max = 5)
         {
             var random = new Random();
 
