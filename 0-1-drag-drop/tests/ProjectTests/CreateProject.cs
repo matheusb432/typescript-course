@@ -24,8 +24,8 @@ namespace ProjectTests
         [ClassCleanup]
         public static void CleanupClass()
         {
-            //driver.Close();
-            //driver.Dispose();
+            driver.Close();
+            driver.Dispose();
         }
 
         [TestInitialize]
@@ -55,11 +55,8 @@ namespace ProjectTests
             FillTextInputs();
             SubmitProject();
 
-            driver.FindElement(By.XPath("//ul[@id='active-projects-list']/li")).Click();
-            driver.FindElement(By.XPath("//ul[@id='active-projects-list']/li[2]")).Click();
-
             var projectsList = driver.FindElement(By.Id("active-projects-list"));
-            var projectItems = projectsList.FindElements(By.XPath(".//*"));
+            var projectItems = projectsList.FindElements(By.XPath(".//li"));
 
             Assert.IsTrue(projectItems.Count == 2);
         }
@@ -68,12 +65,15 @@ namespace ProjectTests
         {
             driver ??= CreateProject.driver;
 
+            var randStr = WebDriverUtils.RandomString();
+            var randNum = WebDriverUtils.RandomInt();
+
             driver.FindElement(By.Id("title")).Clear();
-            driver.FindElement(By.Id("title")).SendKeys("Project Title");
+            driver.FindElement(By.Id("title")).SendKeys($"Title -- {randStr}");
             driver.FindElement(By.Id("description")).Clear();
-            driver.FindElement(By.Id("description")).SendKeys("Valid description data");
+            driver.FindElement(By.Id("description")).SendKeys($"Description -- {randStr}");
             driver.FindElement(By.Id("people")).Clear();
-            driver.FindElement(By.Id("people")).SendKeys("4");
+            driver.FindElement(By.Id("people")).SendKeys(randNum.ToString());
         }
 
         public static void FillInvalidTextInputs(IWebDriver? driver = null)
@@ -81,7 +81,7 @@ namespace ProjectTests
             driver ??= CreateProject.driver;
 
             driver.FindElement(By.Id("title")).Clear();
-            driver.FindElement(By.Id("title")).SendKeys("Invalid description data");
+            driver.FindElement(By.Id("title")).SendKeys("Invalid Project");
             driver.FindElement(By.Id("description")).Clear();
             driver.FindElement(By.Id("description")).SendKeys(".");
             driver.FindElement(By.Id("people")).Clear();

@@ -1,6 +1,21 @@
+interface Draggable {
+  dragStartHandler(event: DragEvent): void;
+  dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+  dragOverHandler(event: DragEvent): void;
+  dropHandler(event: DragEvent): void;
+  dragLeaveHandler(event: DragEvent): void;
+}
+
 enum ProjectStatus {
   Active = 'active',
   Finished = 'finished',
+}
+
+function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 class Project {
@@ -15,6 +30,7 @@ class Project {
 
 type Listener<T> = (items: T[]) => void;
 
+// NOTE abstract class to manage state using the Observer (or Pub/Sub) design pattern
 abstract class State<T> {
   protected listeners: Listener<T>[] = [];
 
@@ -22,11 +38,15 @@ abstract class State<T> {
   addListener(listenerFn: Listener<T>) {
     this.listeners.push(listenerFn);
   }
+
+  // NOTE notifying all current listeners by executing every registered listener function
+  notifyListeners(items: T[]) {
+    for (const listenerFn of this.listeners) listenerFn(items);
+  }
 }
 
 // NOTE Custom state management class
 class ProjectState extends State<Project> {
-  //   private listeners: Listener[] = [];
   private projects: Project[] = [];
   private static instance: ProjectState;
 
@@ -45,10 +65,6 @@ class ProjectState extends State<Project> {
     return this.instance;
   }
 
-  //   addListener(listenerFn: Listener) {
-  //     this.listeners.push(listenerFn);
-  //   }
-
   addProject(title: string, description: string, people: number) {
     const newProject = new Project(`${Math.random()}`, title, description, people);
 
@@ -56,7 +72,30 @@ class ProjectState extends State<Project> {
     this.projects = [...this.projects, newProject];
 
     // NOTE passing a copy of this array to all subscribers so that only this class can update the state of projects
-    for (const listenerFn of this.listeners) listenerFn(this.projects.slice());
+    this.notifyProjectListeners();
+  }
+
+  moveProject(id: string, status: ProjectStatus) {
+    const [project, projectIndex] = this.getDropProject(id);
+
+    if (project == null || projectIndex === -1 || project.status === status) return;
+
+    project.status = status;
+
+    this.projects[projectIndex] = deepClone(project);
+
+    this.notifyProjectListeners();
+  }
+
+  private notifyProjectListeners() {
+    this.notifyListeners(this.projects.slice());
+  }
+
+  private getDropProject(id: string): [Project | undefined, number] {
+    const project = this.projects.find((prj) => prj.id === id);
+    const projectIndex = this.projects.findIndex((prj) => prj === project);
+
+    return [project, projectIndex];
   }
 }
 
@@ -156,7 +195,49 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract renderContent(): void;
 }
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
+  private project: Project;
+
+  get persons(): string {
+    return this.project.people === 1 ? '1 person' : `${this.project.people} persons`;
+  }
+
+  constructor(hostId: string, project: Project) {
+    super('single-project', hostId, false, project.id);
+
+    this.project = project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  @Autobind
+  dragStartHandler(event: DragEvent): void {
+    event.dataTransfer!.setData('text/plain', this.project.id);
+
+    event.dataTransfer!.effectAllowed = 'move';
+  }
+
+  @Autobind
+  dragEndHandler(event: DragEvent): void {
+    console.log(event.dataTransfer);
+    console.log('Drag End');
+  }
+
+  // NOTE configuring drag and drop event listeners
+  configure(): void {
+    this.element.addEventListener('dragstart', this.dragStartHandler);
+    this.element.addEventListener('dragend', this.dragEndHandler);
+  }
+
+  renderContent(): void {
+    this.element.querySelector('h2')!.textContent = this.project.title;
+    this.element.querySelector('h3')!.textContent = `${this.persons} assigned`;
+    this.element.querySelector('p')!.textContent = this.project.description;
+  }
+}
+
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
   assignedProjects: Project[];
 
   constructor(private type: ProjectStatus) {
@@ -169,11 +250,40 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     this.renderContent();
   }
 
+  @Autobind
+  dragOverHandler(event: DragEvent): void {
+    if (event.dataTransfer?.types[0] !== 'text/plain') return;
+
+    event.preventDefault();
+
+    const listEl = this.element.querySelector('ul')!;
+
+    listEl.classList.add('droppable');
+  }
+
+  @Autobind
+  dropHandler(event: DragEvent): void {
+    const projectId = event.dataTransfer!.getData('text/plain');
+
+    projectState.moveProject(projectId, this.type);
+  }
+
+  @Autobind
+  dragLeaveHandler(_event: DragEvent): void {
+    const listEl = this.element.querySelector('ul')!;
+
+    listEl.classList.remove('droppable');
+  }
+
   get listId() {
     return `${this.type}-projects-list`;
   }
 
   configure() {
+    this.element.addEventListener('dragover', this.dragOverHandler);
+    this.element.addEventListener('dragleave', this.dragLeaveHandler);
+    this.element.addEventListener('drop', this.dropHandler);
+
     // NOTE this subscription will update the reference of assignedProjects whenever ProjectState emits an event
     projectState.addListener(this.projectListener);
   }
@@ -184,22 +294,23 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 
     this.assignedProjects = relevantProjects;
 
+    console.log(this.assignedProjects);
+
     this.renderProjects();
   }
 
-  private renderProjects() {
+  private renderProjects(): void | never {
     const listEl = document.getElementById(this.listId) as HTMLUListElement;
 
-    if (!listEl) return;
+    if (!listEl) {
+      throw Error(`Couldn\'t get list element with id ${this.listId}`);
+    }
 
     this.destroyItems(listEl);
 
     for (const projectItem of this.assignedProjects) {
-      const listItem = document.createElement('li');
-
-      listItem.textContent = projectItem.title;
-
-      listEl.appendChild(listItem);
+      // NOTE the project items will be rendered at instantiation, so even if the references of these objects are lost, the elements are still correctly rendered.
+      new ProjectItem(listEl.id, projectItem);
     }
   }
 
