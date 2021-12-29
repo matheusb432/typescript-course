@@ -21,7 +21,5 @@
     "experimentalDecorators": true,
     "esModuleInterop": true
   },
-  "exclude": [
-    "node_modules" // would be the default
-  ]
+  "exclude": ["node_modules", "tests"]
 }
