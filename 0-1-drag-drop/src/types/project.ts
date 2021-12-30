@@ -1,3 +1,4 @@
+// NOTE defining a namespace is a way to separate the app into modules
 namespace App {
   export enum ProjectStatus {
     Active = 'active',
