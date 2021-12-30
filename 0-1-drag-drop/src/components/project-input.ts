@@ -1,75 +1,76 @@
-/// <reference path="base-component.ts" />
-/// <reference path="../decorators/autobind.ts" />
-/// <reference path="../state/project-state.ts" />
+// NOTE import alias, only use to avoid name clashes as it can make the code a bit more confusing
+import { Autobind as autobind } from '../decorators/autobind.js';
+import { projectState } from '../state/project-state.js';
+// NOTE any exports from this file will be acessible with Validation.{exported item}
+import * as Validation from '../util/validation.js';
+import Component from './base-component.js';
 
-namespace App {
-  export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
-    titleInputElement: HTMLInputElement;
-    descriptionInputElement: HTMLTextAreaElement;
-    peopleInputElement: HTMLInputElement;
+export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
+  titleInputElement: HTMLInputElement;
+  descriptionInputElement: HTMLTextAreaElement;
+  peopleInputElement: HTMLInputElement;
 
-    constructor() {
-      super('project-input', 'app', false, 'user-input');
+  constructor() {
+    super('project-input', 'app', false, 'user-input');
 
-      this.titleInputElement = this.element.querySelector('#title') as HTMLInputElement;
-      this.descriptionInputElement = this.element.querySelector(
-        '#description'
-      ) as HTMLTextAreaElement;
-      this.peopleInputElement = this.element.querySelector('#people') as HTMLInputElement;
+    this.titleInputElement = this.element.querySelector('#title') as HTMLInputElement;
+    this.descriptionInputElement = this.element.querySelector(
+      '#description'
+    ) as HTMLTextAreaElement;
+    this.peopleInputElement = this.element.querySelector('#people') as HTMLInputElement;
+  }
+
+  static initInput() {
+    // TODO rename to more descriptive after modules refactor is realized
+    const pInput = new ProjectInput();
+
+    pInput.configure();
+
+    return pInput;
+  }
+
+  private gatherUserInput(): [string, string, number] | void {
+    const titleValue = this.titleInputElement.value;
+    const descriptionValue = this.descriptionInputElement.value;
+    const peopleValue = +this.peopleInputElement.value;
+
+    if (
+      !Validation.validate({ value: titleValue, required: true }) ||
+      !Validation.validate({ value: descriptionValue, required: true, minLength: 5 }) ||
+      !Validation.validate({ value: peopleValue, required: true, min: 1, max: 5 })
+    ) {
+      alert('Invalid input!');
+
+      return;
     }
 
-    static initInput() {
-      // TODO rename to more descriptive after modules refactor is realized
-      const pInput = new ProjectInput();
+    return [titleValue, descriptionValue, peopleValue];
+  }
 
-      pInput.configure();
+  renderContent(): void {}
 
-      return pInput;
-    }
+  private clearInputs() {
+    this.titleInputElement.value = '';
+    this.descriptionInputElement.value = '';
+    this.peopleInputElement.value = '';
+  }
 
-    private gatherUserInput(): [string, string, number] | void {
-      const titleValue = this.titleInputElement.value;
-      const descriptionValue = this.descriptionInputElement.value;
-      const peopleValue = +this.peopleInputElement.value;
+  @autobind
+  private submitHandler(event: Event) {
+    event.preventDefault();
 
-      if (
-        !validate({ value: titleValue, required: true }) ||
-        !validate({ value: descriptionValue, required: true, minLength: 5 }) ||
-        !validate({ value: peopleValue, required: true, min: 1, max: 5 })
-      ) {
-        alert('Invalid input!');
+    const userInput = this.gatherUserInput();
 
-        return;
-      }
+    if (!Array.isArray(userInput)) return;
 
-      return [titleValue, descriptionValue, peopleValue];
-    }
+    const [title, desc, people] = userInput;
 
-    renderContent(): void {}
+    projectState.addProject(title, desc, people);
 
-    private clearInputs() {
-      this.titleInputElement.value = '';
-      this.descriptionInputElement.value = '';
-      this.peopleInputElement.value = '';
-    }
+    this.clearInputs();
+  }
 
-    @Autobind
-    private submitHandler(event: Event) {
-      event.preventDefault();
-
-      const userInput = this.gatherUserInput();
-
-      if (!Array.isArray(userInput)) return;
-
-      const [title, desc, people] = userInput;
-
-      projectState.addProject(title, desc, people);
-
-      this.clearInputs();
-    }
-
-    configure() {
-      this.element.addEventListener('submit', this.submitHandler);
-    }
+  configure() {
+    this.element.addEventListener('submit', this.submitHandler);
   }
 }

@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "amd",
+    "module": "es2015",
     "lib": ["dom", "es6", "dom.iterable", "scripthost"],
     // NOTE all the compiled JS will only be in one file when outFile is defined
-    "outFile": "./dist/bundle.js",
+    // "outFile": "./dist/bundle.js",
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
