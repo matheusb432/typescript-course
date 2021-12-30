@@ -1,9 +1,9 @@
 // NOTE import alias, only use to avoid name clashes as it can make the code a bit more confusing
-import { Autobind as autobind } from '../decorators/autobind.js';
-import { projectState } from '../state/project-state.js';
+import { Autobind as autobind } from '../decorators/autobind';
+import { projectState } from '../state/project-state';
 // NOTE any exports from this file will be acessible with Validation.{exported item}
-import * as Validation from '../util/validation.js';
-import Component from './base-component.js';
+import * as Validation from '../util/validation';
+import Component from './base-component';
 
 export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   titleInputElement: HTMLInputElement;

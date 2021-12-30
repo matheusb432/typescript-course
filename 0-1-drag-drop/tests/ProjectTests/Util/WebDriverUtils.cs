@@ -5,7 +5,7 @@ namespace ProjectTests.Util
 {
     public static class WebDriverUtils
     {
-        public const string baseUrl = "http://localhost:3000/";
+        public const string baseUrl = "http://localhost:8081/";
 
         public static string RandomString(int length = 5, bool includeLetters = true, bool includeNumbers = true)
         {

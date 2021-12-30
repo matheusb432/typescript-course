@@ -5,9 +5,12 @@
 /// <reference path="components/project-list.ts" />
 */
 
-import { ProjectInput } from './components/project-input.js';
-import { ProjectList } from './components/project-list.js';
-import { ProjectStatus } from './types/project.js';
+// NOTE .js for the extension name should not be present if webpack is the project bundler
+// import { ProjectInput } from './components/project-input.js';
+
+import { ProjectInput } from './components/project-input';
+import { ProjectList } from './components/project-list';
+import { ProjectStatus } from './types/project';
 
 ProjectInput.initInput();
 ProjectList.initList(ProjectStatus.Active);

@@ -1,5 +1,5 @@
-import { Project, ProjectStatus } from '../types/project.js';
-import { deepClone } from '../util/utils.js';
+import { Project, ProjectStatus } from '../types/project';
+import { deepClone } from '../util/utils';
 
 type Listener<T> = (items: T[]) => void;
 
