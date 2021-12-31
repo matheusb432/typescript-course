@@ -1,0 +1,119 @@
+--	Setup
+	1.	Install Node.js
+		>>	Go to https://nodejs.org/en and download LTS version
+
+	2.	Install TypeScript
+		>>	npm install -g typescript
+
+	3.	Compile a TS file to JS
+		>>	tsc {filename}.ts
+
+--	Why Use Typescript?
+
+	1.	To find and fix bugs at compilation, instead of at runtime, where bugs can possibly leak to production instead of being fixed early
+
+	2.	To write type safe code so functions and classes are more obvious to what they do, so that the compiler catches type errors at compilation
+
+	3.	To have (unsound) null safety, which avoids what is the most common type of bug apps can have
+
+	4.	To always have the newest features of ECMAScript, such as the ES2021 new short-circuit operators that were added to typescript years before it's release	
+
+	5.	To have useful features such as generics, interfaces and enums
+
+	6.	Forces the developer to write cleaner, clearer and less error prone code.
+
+--	General
+	--	If a variable type can be inferred in assignment, it's explicit type should usually not be specified.
+
+	--	Interfaces can't be translated to JS, naturally because JS can't really enforce the type safety that interfaces bring. 
+
+	--	Generics types can have constraints, by using the `T extends {type}` syntax, it can limit a type to be a key of an object, a primitive or custom type, union types etc.
+
+--	CLI Commands
+
+	>>	npm i -g typescript 
+		--	Installs typescript globally
+
+	>>	tsc {filename}.ts 
+		--	Compiles TypeScript file to JavaScript
+
+		>>	-w
+			--	Watches the file for changes and recompiles it automatically
+
+		>>	--init
+			==	Initializes the project as a TS project, creates a tsconfig.json file
+
+			==	Also makes running `tsc` to compile all TS files into JS files
+
+--	Core Syntax & Types
+
+	--	Basics
+
+		>>	any
+			--	Any type, should be not used if possible 
+
+		>>	number
+			--	All numbers, no differentiation between integers or floats
+
+			>>	4, 12.4, -10
+
+		>>	string
+			--	Any array of characters, all text values
+
+			>>	'Hello World!', "Hello World!", `Hello World!`
+
+		>>	boolean
+			--	true or false values
+
+			>>	true, false
+
+		>>	object
+			--	Any JS object
+
+			>>	{ age: 21 }
+
+		>>	Array
+			--	Any JS array, type of array values can be flexible or strict 
+
+			>>	[1, 2, 3]
+
+	>>	unknown
+		--	A more type safe alternative to `any`, can be assigned to any type but other types can't be assigned to itself
+
+	>>	never
+		--	Specifies that a function will never return anything, such as an error generator function or an infinite loop
+
+		--	A function returning 'never' cannot have a reachable end point 
+
+	>>	Tuple ([number, string])
+		--	A fixed length array
+
+		>>	[1, 2]
+
+	>>	Enum (enum Values { Value1, Value2 })
+		--	Automatically enumerated global constant identifiers
+
+		>>	Values.Value1, Values.Value2
+
+	>>	Function types ((a: number, b: number) => void)
+		--	Specifiy what should be the parameters and return type of a function
+
+	>>	Generics (Type<T>)
+		--	Enable the usage of a type that can vary depending on it's T type, like a class that can have an array of either strings, numbers etc, but then be consistent with the type for that instance.
+
+		>>	Promise<T>, Array<T>, ...
+
+--	Decorators
+
+	--	Many libraries (including @angular/core) use PascalCase for decorator naming conventions, but camelCase is also acceptable 
+
+	--	An important distinction is that a decorator factory is the function which defines the decorator, while the decorator itself is that decorator factory function call on the class or property.
+
+--	Modules
+		--	namespaces are a TS way to organize the code into modules, although not really necessary for most use cases even in TS due to the import/export ES6 feature
+
+		--	Webpack
+
+			--	By bundling the code into one single file, the JS is downloaded much faster than it would if each file would be downloaded individually due to the overhead that each HTTP request takes to be sent.
+
+			--	Webpack creates code bundles, that minifies the code to optimize it as much as possible
